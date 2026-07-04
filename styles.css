@@ -1,0 +1,292 @@
+/* ============================================================
+   NATIONS CHAMPIONSHIP 2026 — STYLES
+   Palette: deep pitch green + chalk lines + a single gold
+   try-line accent. North = steel blue, South = burnt ochre.
+   ============================================================ */
+
+:root {
+  --pitch: #0F2419;
+  --pitch-deep: #081712;
+  --panel: #163326;
+  --chalk: #F3F0E6;
+  --chalk-dim: #C7CFC5;
+  --gold: #C9A227;
+  --north: #4C7FB8;
+  --south: #C1622E;
+  --line: rgba(243, 240, 230, 0.14);
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--pitch);
+  color: var(--chalk);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.5;
+}
+
+h1, h2, h3, .display {
+  font-family: 'Anton', 'Arial Narrow', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+a { color: var(--gold); }
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ---------------- HERO ---------------- */
+
+.hero {
+  position: relative;
+  padding: 72px 0 48px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0px, transparent 78px,
+      var(--line) 78px, var(--line) 79px
+    );
+  border-bottom: 3px dashed var(--gold);
+}
+
+.hero-eyebrow {
+  color: var(--gold);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-size: clamp(40px, 7vw, 84px);
+  line-height: 0.95;
+  margin-top: 10px;
+  color: var(--chalk);
+}
+
+.hero h1 span { color: var(--gold); }
+
+.hero-sub {
+  max-width: 640px;
+  margin-top: 18px;
+  color: var(--chalk-dim);
+  font-size: 16px;
+}
+
+.hemisphere-line {
+  display: flex;
+  gap: 10px;
+  margin-top: 28px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.hemisphere-line .tag {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot-north { background: var(--north); }
+.dot-south { background: var(--south); }
+.team-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+
+/* ---------------- SECTION HEADERS ---------------- */
+
+.section {
+  padding: 56px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.section-head h2 {
+  font-size: clamp(26px, 4vw, 36px);
+}
+
+.section-head .note {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--chalk-dim);
+}
+
+/* ---------------- STANDINGS ---------------- */
+
+.tables-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 760px) {
+  .tables-grid { grid-template-columns: 1fr; }
+}
+
+.table-panel {
+  background: var(--panel);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border-top: 4px solid var(--north-or-south, var(--gold));
+}
+
+.table-panel.north { border-top-color: var(--north); }
+.table-panel.south { border-top-color: var(--south); }
+
+.table-panel h3 {
+  font-size: 15px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+thead th {
+  text-align: left;
+  padding: 8px 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--chalk-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--line);
+}
+
+tbody td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--line);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+tbody tr.is-leader td { color: var(--gold); }
+
+td.rank { color: var(--chalk-dim); width: 24px; }
+td.team-cell {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  white-space: nowrap;
+}
+td.pts { font-weight: 700; }
+
+.table-note {
+  padding: 10px 18px 16px;
+  font-size: 11px;
+  color: var(--chalk-dim);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* ---------------- FIXTURES ---------------- */
+
+.round-block { margin-bottom: 34px; }
+
+.round-block h3 {
+  font-size: 16px;
+  color: var(--chalk-dim);
+  margin-bottom: 12px;
+  letter-spacing: 0.06em;
+}
+
+.match-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .match-list { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 620px) {
+  .match-list { grid-template-columns: 1fr; }
+}
+
+.match-card {
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+}
+
+.match-card.is-final {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, rgba(201,162,39,0.12), var(--panel));
+}
+
+.match-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: var(--chalk-dim);
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.match-score-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.match-score-row .side { flex: 1; }
+.match-score-row .side:last-child { text-align: right; }
+
+.match-score-row .score {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  color: var(--gold);
+  white-space: nowrap;
+  padding: 0 6px;
+}
+
+.match-status {
+  margin-top: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: var(--chalk-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---------------- FOOTER ---------------- */
+
+footer {
+  padding: 32px 0 60px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  color: var(--chalk-dim);
+}
+
+footer a { color: var(--chalk-dim); text-decoration: underline; }
