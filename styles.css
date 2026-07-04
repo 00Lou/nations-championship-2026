@@ -209,6 +209,22 @@ td.pts { font-weight: 700; }
 
 .round-block { margin-bottom: 34px; }
 
+.finals-intro {
+  background: linear-gradient(180deg, rgba(201,162,39,0.14), rgba(201,162,39,0.04));
+  border: 1px solid rgba(201,162,39,0.4);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  font-size: 13.5px;
+  color: var(--chalk);
+  margin-bottom: 24px;
+}
+
+.finals-intro strong { color: var(--gold); }
+
+.match-status.is-provisional {
+  color: var(--gold);
+}
+
 .round-block h3 {
   font-size: 16px;
   color: var(--chalk-dim);
