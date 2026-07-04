@@ -1,6 +1,5 @@
 /* ============================================================
    NATIONS CHAMPIONSHIP 2026 — APP LOGIC
-   You shouldn't need to edit this file. Edit data.js instead.
    ============================================================ */
 
 const POOL_ROUNDS = [1, 2, 3, 4, 5, 6];
@@ -22,7 +21,7 @@ function buildStandings(conferenceKey) {
     if (!m.played || typeof m.round !== "number" || !POOL_ROUNDS.includes(m.round)) return;
 
     [ { name: m.home, isHome: true }, { name: m.away, isHome: false } ].forEach(side => {
-      if (!(side.name in rows)) return; // team not in this conference
+      if (!(side.name in rows)) return; 
       const row = rows[side.name];
       const own = side.isHome ? m.homeScore : m.awayScore;
       const opp = side.isHome ? m.awayScore : m.homeScore;
@@ -83,10 +82,6 @@ function poolStageFinished() {
   return completedRounds() === POOL_ROUNDS[POOL_ROUNDS.length - 1];
 }
 
-// Resolves a placeholder like "Northern #3" or "Southern #3" to the team
-// currently sitting in that position, using the standings as they stand
-// right now. Returns null if it isn't a placeholder (i.e. a real team name
-// has already been filled in by hand).
 function resolvePlaceholder(label) {
   const match = /^(Northern|Southern) #(\d+)$/.exec(label);
   if (!match) return null;
@@ -128,12 +123,13 @@ function renderFixtures() {
   if (finalsRoundsPresent.length) {
     const finished = poolStageFinished();
     const done = completedRounds();
+    const formattedDate = new Date(LAST_UPDATED).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
     const note = document.createElement("div");
-    note.className = "finals-note";
-    note.textContent = finished
-      ? "Finals Weekend — 27–29 November, Twickenham."
-      : `Finals Weekend, 27–29 November — projected from standings after Round ${done} of 6.`;
+    note.className = `finals-banner ${finished ? 'is-confirmed' : 'is-projected'}`;
+    note.innerHTML = finished
+      ? `<strong>⚡ Finals Weekend Locked</strong> — Fixtures are officially confirmed.`
+      : `<strong>🔮 Finals Weekend (Projected)</strong> — As things currently stand as of ${formattedDate} (After Round ${done} of 6).`;
     container.appendChild(note);
 
     finalsRoundsPresent.forEach(round => {
@@ -156,7 +152,8 @@ function buildRoundSection(title, roundMatches, opts) {
 
   roundMatches.forEach(m => {
     const row = document.createElement("div");
-    row.className = "match-row" + (m.isGrandFinal ? " is-final" : "");
+    const isFinalsWeekend = typeof m.round === "string";
+    row.className = "match-row" + (m.isGrandFinal ? " is-final" : "") + (isFinalsWeekend ? " finals-bracket" : "");
 
     const homeResolved = resolvePlaceholder(m.home);
     const awayResolved = resolvePlaceholder(m.away);
@@ -164,14 +161,22 @@ function buildRoundSection(title, roundMatches, opts) {
     const awayName = awayResolved ? awayResolved.team : m.away;
     const isProvisional = opts.projected && (homeResolved || awayResolved);
 
-    const status = statusLabel(m);
-    const tag = isProvisional ? `<span class="tag">Projected</span>` : (status ? `<span class="tag">${status}</span>` : "");
+    let tagHtml = "";
+    if (isFinalsWeekend) {
+      tagHtml = isProvisional 
+        ? `<span class="badge badge-projected">As It Stands</span>` 
+        : `<span class="badge badge-confirmed">Guaranteed</span>`;
+    } else {
+      const status = statusLabel(m);
+      if (status) tagHtml = `<span class="badge badge-pending">${status}</span>`;
+    }
 
     row.innerHTML = `
       <span class="date">${formatDate(m.date)}</span>
       <span class="home">${homeName}</span>
-      <span class="score">${m.played ? m.homeScore + "–" + m.awayScore : "v"}${tag}</span>
+      <span class="score">${m.played ? m.homeScore + "–" + m.awayScore : "v"}</span>
       <span class="away">${awayName}</span>
+      <span class="status-cell">${tagHtml}</span>
     `;
     list.appendChild(row);
   });
