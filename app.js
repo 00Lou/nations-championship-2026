@@ -57,17 +57,12 @@ function renderTable(conferenceKey) {
     if (i === 0) tr.classList.add("is-leader");
     tr.innerHTML = `
       <td class="rank">${i + 1}</td>
-      <td class="team-cell">
-        <span class="team-dot dot-${conferenceKey}"></span>${r.team}
-      </td>
+      <td class="team-cell">${r.team}</td>
       <td>${r.played}</td>
       <td>${r.won}</td>
       <td>${r.drawn}</td>
       <td>${r.lost}</td>
-      <td>${r.pf}</td>
-      <td>${r.pa}</td>
       <td>${r.diff > 0 ? "+" + r.diff : r.diff}</td>
-      <td>${r.bonus}</td>
       <td class="pts">${r.points}</td>
     `;
     tbody.appendChild(tr);
@@ -103,19 +98,18 @@ function resolvePlaceholder(label) {
 }
 
 function statusLabel(m) {
-  if (m.isGrandFinal) return m.played ? "FT" : "Not yet played";
-  if (m.played) return "FT";
+  if (m.played) return null;
   const today = new Date();
   const matchDate = new Date(m.date);
-  if (!isNaN(matchDate) && matchDate < today) return "Result pending";
-  return "Upcoming";
+  if (!isNaN(matchDate) && matchDate < today) return "Pending";
+  return null;
 }
 
 function formatDate(dateStr) {
-  if (!dateStr || dateStr.includes("TBC")) return "Date TBC";
+  if (!dateStr || dateStr.includes("TBC")) return "TBC";
   const d = new Date(dateStr + "T00:00:00Z");
   if (isNaN(d)) return dateStr;
-  return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 }
 
 function renderFixtures() {
@@ -126,23 +120,21 @@ function renderFixtures() {
   const poolRoundsPresent = allRounds.filter(r => typeof r === "number");
   const finalsRoundsPresent = allRounds.filter(r => typeof r !== "number");
 
-  // ---- Pool stage rounds ----
   poolRoundsPresent.forEach(round => {
     const roundMatches = MATCHES.filter(m => m.round === round);
     container.appendChild(buildRoundSection(`Round ${round}`, roundMatches, { projected: false }));
   });
 
-  // ---- Finals Weekend ----
   if (finalsRoundsPresent.length) {
     const finished = poolStageFinished();
     const done = completedRounds();
 
-    const intro = document.createElement("div");
-    intro.className = "finals-intro";
-    intro.innerHTML = finished
-      ? `<strong>Finals Weekend — 27–29 November, Twickenham.</strong> Pool play is complete, so the matchups below are final.`
-      : `<strong>Finals Weekend — 27–29 November, Twickenham.</strong> Pairings are decided by final conference position, so until all six pool rounds are played, the matchups below are a <em>live projection</em> based on the standings as they stand after Round ${done} of 6 — not confirmed.`;
-    container.appendChild(intro);
+    const note = document.createElement("div");
+    note.className = "finals-note";
+    note.textContent = finished
+      ? "Finals Weekend — 27–29 November, Twickenham."
+      : `Finals Weekend, 27–29 November — projected from standings after Round ${done} of 6.`;
+    container.appendChild(note);
 
     finalsRoundsPresent.forEach(round => {
       const roundMatches = MATCHES.filter(m => m.round === round);
@@ -163,36 +155,25 @@ function buildRoundSection(title, roundMatches, opts) {
   list.className = "match-list";
 
   roundMatches.forEach(m => {
-    const card = document.createElement("div");
-    card.className = "match-card" + (m.isGrandFinal ? " is-final" : "");
+    const row = document.createElement("div");
+    row.className = "match-row" + (m.isGrandFinal ? " is-final" : "");
 
-    // Resolve provisional placeholders ("Northern #3") to actual team names
-    // based on current standings, if this match hasn't been manually filled in.
     const homeResolved = resolvePlaceholder(m.home);
     const awayResolved = resolvePlaceholder(m.away);
-
     const homeName = homeResolved ? homeResolved.team : m.home;
     const awayName = awayResolved ? awayResolved.team : m.away;
-    const homeConf = homeResolved ? homeResolved.conferenceKey : teamConference(m.home);
-    const awayConf = awayResolved ? awayResolved.conferenceKey : teamConference(m.away);
     const isProvisional = opts.projected && (homeResolved || awayResolved);
 
-    let status = statusLabel(m);
-    if (isProvisional) status = "Projected — provisional";
+    const status = statusLabel(m);
+    const tag = isProvisional ? `<span class="tag">Projected</span>` : (status ? `<span class="tag">${status}</span>` : "");
 
-    card.innerHTML = `
-      <div class="match-meta">
-        <span class="match-date">${formatDate(m.date)}${m.time ? " · " + m.time : ""}</span>
-        <span class="match-venue">${m.venue}</span>
-      </div>
-      <div class="match-score-row">
-        <span class="side ${homeConf ? "dot-" + homeConf : ""}">${homeName}</span>
-        <span class="score">${m.played ? m.homeScore + " – " + m.awayScore : "vs"}</span>
-        <span class="side ${awayConf ? "dot-" + awayConf : ""}">${awayName}</span>
-      </div>
-      <div class="match-status${isProvisional ? " is-provisional" : ""}">${status}</div>
+    row.innerHTML = `
+      <span class="date">${formatDate(m.date)}</span>
+      <span class="home">${homeName}</span>
+      <span class="score">${m.played ? m.homeScore + "–" + m.awayScore : "v"}${tag}</span>
+      <span class="away">${awayName}</span>
     `;
-    list.appendChild(card);
+    list.appendChild(row);
   });
 
   section.appendChild(list);
@@ -204,7 +185,8 @@ function renderLastUpdated() {
   const d = new Date(LAST_UPDATED);
   el.textContent = isNaN(d)
     ? LAST_UPDATED
-    : d.toLocaleString("en-GB", { dateStyle: "long", timeStyle: "short", timeZone: "UTC" }) + " UTC";
+    : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }) +
+      ", " + d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" }) + " UTC";
 }
 
 function init() {
