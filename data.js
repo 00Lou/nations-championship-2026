@@ -1,31 +1,3 @@
-/* ============================================================
-   NATIONS CHAMPIONSHIP 2026 — DATA FILE
-   ============================================================
-   This is the ONLY file you need to touch to keep the site
-   up to date. Everything else (tables, standings, finals
-   projection) is calculated automatically from what's here.
-
-   HOW TO UPDATE A RESULT
-   -----------------------
-   Find the match below (matched by round + teams) and fill in
-   homeScore / awayScore, then flip played to true. Optional
-   bonus point fields default to 0 — set them to 1 if a team
-   earned a bonus point (4+ tries, or a losing margin of 7 or
-   fewer points).
-
-   Example, before:
-     { round: 1, date: "2026-07-04", venue: "Estadio Mario Alberto Kempes, Córdoba",
-       home: "Argentina", away: "Scotland", homeScore: null, awayScore: null, played: false }
-
-   Example, after:
-     { round: 1, date: "2026-07-04", venue: "Estadio Mario Alberto Kempes, Córdoba",
-       home: "Argentina", away: "Scotland", homeScore: 28, awayScore: 21, played: true,
-       homeBonus: 1, awayBonus: 0 }
-
-   Save the file, commit, and push — GitHub Pages will rebuild
-   the live site automatically within a minute or two.
-   ============================================================ */
-
 const CONFERENCES = {
   north: {
     label: "European Conference (Northern Hemisphere)",
@@ -63,7 +35,7 @@ const MATCHES = [
     homeBonus: 1, awayBonus: 0 },
 
   { round: 1, date: "2026-07-04", venue: "Estadio Mario Alberto Kempes, Córdoba",
-    home: "Argentina", away: "Scotland", homeScore: null, awayScore: null, played: false,
+    home: "Argentina", away: "Scotland", homeScore: 38, awayScore: 47, played: true,
     homeBonus: 0, awayBonus: 0 },
 
   // ---------------- ROUND 2 — 11 July 2026 ----------------
