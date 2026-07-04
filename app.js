@@ -74,6 +74,34 @@ function renderTable(conferenceKey) {
   });
 }
 
+function completedRounds() {
+  let completed = 0;
+  for (const r of POOL_ROUNDS) {
+    const roundMatches = MATCHES.filter(m => m.round === r);
+    if (roundMatches.length && roundMatches.every(m => m.played)) completed = r;
+    else break;
+  }
+  return completed;
+}
+
+function poolStageFinished() {
+  return completedRounds() === POOL_ROUNDS[POOL_ROUNDS.length - 1];
+}
+
+// Resolves a placeholder like "Northern #3" or "Southern #3" to the team
+// currently sitting in that position, using the standings as they stand
+// right now. Returns null if it isn't a placeholder (i.e. a real team name
+// has already been filled in by hand).
+function resolvePlaceholder(label) {
+  const match = /^(Northern|Southern) #(\d+)$/.exec(label);
+  if (!match) return null;
+  const conferenceKey = match[1] === "Northern" ? "north" : "south";
+  const rank = parseInt(match[2], 10);
+  const table = buildStandings(conferenceKey);
+  const row = table[rank - 1];
+  return row ? { team: row.team, conferenceKey } : null;
+}
+
 function statusLabel(m) {
   if (m.isGrandFinal) return m.played ? "FT" : "Not yet played";
   if (m.played) return "FT";
@@ -94,45 +122,81 @@ function renderFixtures() {
   const container = document.getElementById("fixtures");
   container.innerHTML = "";
 
-  const rounds = [...new Set(MATCHES.map(m => m.round))];
+  const allRounds = [...new Set(MATCHES.map(m => m.round))];
+  const poolRoundsPresent = allRounds.filter(r => typeof r === "number");
+  const finalsRoundsPresent = allRounds.filter(r => typeof r !== "number");
 
-  rounds.forEach(round => {
+  // ---- Pool stage rounds ----
+  poolRoundsPresent.forEach(round => {
     const roundMatches = MATCHES.filter(m => m.round === round);
-    const section = document.createElement("section");
-    section.className = "round-block";
-
-    const heading = document.createElement("h3");
-    heading.textContent = typeof round === "number" ? `Round ${round}` : `Finals Weekend — ${round}`;
-    section.appendChild(heading);
-
-    const list = document.createElement("div");
-    list.className = "match-list";
-
-    roundMatches.forEach(m => {
-      const card = document.createElement("div");
-      card.className = "match-card" + (m.isGrandFinal ? " is-final" : "");
-
-      const homeConf = teamConference(m.home);
-      const awayConf = teamConference(m.away);
-
-      card.innerHTML = `
-        <div class="match-meta">
-          <span class="match-date">${formatDate(m.date)}${m.time ? " · " + m.time : ""}</span>
-          <span class="match-venue">${m.venue}</span>
-        </div>
-        <div class="match-score-row">
-          <span class="side ${homeConf ? "dot-" + homeConf : ""}">${m.home}</span>
-          <span class="score">${m.played ? m.homeScore + " – " + m.awayScore : "vs"}</span>
-          <span class="side ${awayConf ? "dot-" + awayConf : ""}">${m.away}</span>
-        </div>
-        <div class="match-status">${statusLabel(m)}</div>
-      `;
-      list.appendChild(card);
-    });
-
-    section.appendChild(list);
-    container.appendChild(section);
+    container.appendChild(buildRoundSection(`Round ${round}`, roundMatches, { projected: false }));
   });
+
+  // ---- Finals Weekend ----
+  if (finalsRoundsPresent.length) {
+    const finished = poolStageFinished();
+    const done = completedRounds();
+
+    const intro = document.createElement("div");
+    intro.className = "finals-intro";
+    intro.innerHTML = finished
+      ? `<strong>Finals Weekend — 27–29 November, Twickenham.</strong> Pool play is complete, so the matchups below are final.`
+      : `<strong>Finals Weekend — 27–29 November, Twickenham.</strong> Pairings are decided by final conference position, so until all six pool rounds are played, the matchups below are a <em>live projection</em> based on the standings as they stand after Round ${done} of 6 — not confirmed.`;
+    container.appendChild(intro);
+
+    finalsRoundsPresent.forEach(round => {
+      const roundMatches = MATCHES.filter(m => m.round === round);
+      container.appendChild(buildRoundSection(round, roundMatches, { projected: !finished }));
+    });
+  }
+}
+
+function buildRoundSection(title, roundMatches, opts) {
+  const section = document.createElement("section");
+  section.className = "round-block";
+
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  section.appendChild(heading);
+
+  const list = document.createElement("div");
+  list.className = "match-list";
+
+  roundMatches.forEach(m => {
+    const card = document.createElement("div");
+    card.className = "match-card" + (m.isGrandFinal ? " is-final" : "");
+
+    // Resolve provisional placeholders ("Northern #3") to actual team names
+    // based on current standings, if this match hasn't been manually filled in.
+    const homeResolved = resolvePlaceholder(m.home);
+    const awayResolved = resolvePlaceholder(m.away);
+
+    const homeName = homeResolved ? homeResolved.team : m.home;
+    const awayName = awayResolved ? awayResolved.team : m.away;
+    const homeConf = homeResolved ? homeResolved.conferenceKey : teamConference(m.home);
+    const awayConf = awayResolved ? awayResolved.conferenceKey : teamConference(m.away);
+    const isProvisional = opts.projected && (homeResolved || awayResolved);
+
+    let status = statusLabel(m);
+    if (isProvisional) status = "Projected — provisional";
+
+    card.innerHTML = `
+      <div class="match-meta">
+        <span class="match-date">${formatDate(m.date)}${m.time ? " · " + m.time : ""}</span>
+        <span class="match-venue">${m.venue}</span>
+      </div>
+      <div class="match-score-row">
+        <span class="side ${homeConf ? "dot-" + homeConf : ""}">${homeName}</span>
+        <span class="score">${m.played ? m.homeScore + " – " + m.awayScore : "vs"}</span>
+        <span class="side ${awayConf ? "dot-" + awayConf : ""}">${awayName}</span>
+      </div>
+      <div class="match-status${isProvisional ? " is-provisional" : ""}">${status}</div>
+    `;
+    list.appendChild(card);
+  });
+
+  section.appendChild(list);
+  return section;
 }
 
 function renderLastUpdated() {
