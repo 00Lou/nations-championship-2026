@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nations Championship 2026 — Live Tracker</title>
+<meta name="description" content="Standings, results and the road to the Finals Weekend for the inaugural 2026 Nations Championship." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-eyebrow">Inaugural Season · Pool Stage</div>
+    <h1>Nations<br>Champion<span>ship</span> 2026</h1>
+    <p class="hero-sub">
+      Twelve nations. Two conferences. One Grand Final at Twickenham.
+      This page tracks the European Conference against the Rest of World
+      Conference as the pool stage unfolds on the way to Finals Weekend,
+      27–29 November 2026.
+    </p>
+    <div class="hemisphere-line">
+      <span class="tag"><span class="dot dot-north"></span> North — England, France, Ireland, Italy, Scotland, Wales</span>
+      <span class="tag"><span class="dot dot-south"></span> South — Argentina, Australia, Fiji, Japan, New Zealand, South Africa</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="section" id="standings">
+    <div class="section-head">
+      <h2>Standings</h2>
+      <span class="note">P Played · W Win · D Draw · L Loss · PF/PA Points For/Against · BP Bonus · PTS Table Points</span>
+    </div>
+
+    <div class="tables-grid">
+      <div class="table-panel north" id="table-north">
+        <h3><span class="dot dot-north"></span> European Conference</h3>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>PF</th><th>PA</th><th>+/-</th><th>BP</th><th>Pts</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="table-note">Top team meets South's #1 in the Grand Final at Twickenham.</div>
+      </div>
+
+      <div class="table-panel south" id="table-south">
+        <h3><span class="dot dot-south"></span> Rest of World Conference</h3>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>PF</th><th>PA</th><th>+/-</th><th>BP</th><th>Pts</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="table-note">Top team meets North's #1 in the Grand Final at Twickenham.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="fixtures-section">
+    <div class="section-head">
+      <h2>Results &amp; Fixtures</h2>
+      <span class="note">Round-robin · July &amp; November windows</span>
+    </div>
+    <div id="fixtures"></div>
+  </section>
+
+  <section class="section" style="border-bottom:none;" id="about">
+    <div class="section-head"><h2>How it works</h2></div>
+    <p class="hero-sub" style="max-width:720px;">
+      Twelve teams are split into a European Conference (the Six Nations)
+      and a Rest of World Conference (Argentina, Australia, New Zealand,
+      South Africa, plus invited nations Fiji and Japan). Each team plays
+      all six teams from the opposite conference once, home or away,
+      across the July and November Test windows. When the pool stage ends,
+      every team is ranked within its conference and plays its
+      equivalently-ranked opponent from the other conference during
+      Finals Weekend — so 1st plays 1st in the Grand Final, 2nd plays 2nd,
+      and so on — all staged at Allianz Stadium, Twickenham, from
+      27–29 November 2026.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    Data last updated: <span id="last-updated">—</span>.
+    Edit <code>data.js</code> and push to update this page.
+    Not affiliated with World Rugby, Six Nations Rugby or SANZAAR.
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
